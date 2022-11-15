@@ -1,0 +1,165 @@
+{% extends "base.html" %} 
+
+  {% block title %}Eric's Capstone Project{% endblock %}
+  
+  {% block html_head %}
+    <!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega@5"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega-lite@4.0.2"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega-embed@6"></script> -->
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vega/5.22.1/vega.js" integrity="sha512-yn5bKmwlKZRfr3Sg9H7chpIvLr79fx1Eu9bjD+QQOL8EwA9/6IR/ALAgXWiPKnc/lY+RaCjrXVMrPPtbTz26Tw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vega-lite/5.5.0/vega-lite.js" integrity="sha512-tg88MGAX8GRBDNiK4yDX1RSRgq3NLFWODhpaw6uegfqipqV20PPMfLqwL3KejSTh+H6/4NVI5Zez3MNmuDQizg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vega-embed/6.21.0/vega-embed.js" integrity="sha512-5t7QPepgs5ri4kILZaESJZq6b40i0qL6TGdP3HFGBJ7mPFH+zrL7ENkrtze9Dn9HflL0Xv+cp76KafyjkxBDDw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    {% endblock %}
+
+  {% block content%}
+<!--
+    <h1 align="center">Notes</h1>
+    <ul class="list-group list-group-flush" id="notes">
+      {% for note in user.notes %}
+      <li class="list-group-item">
+        {{ note.data }}
+        <button type="button" class="close" onClick="deleteNote({{ note.id }})">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </li>
+      {% endfor %}
+    </ul>
+    <form method="POST">
+      <textarea name="note" id="note" class="form-control"></textarea>
+      <br />
+      <div align="center">
+        <button type="submit" class="btn btn-primary">Add Note</button>
+      </div>
+    </form>
+  -->
+	
+<h1>Forecasting Fiat Currency Exchange Rates</h1>
+<h3>(and Cryptocurrency Prices)</h3>
+<br>
+<p>Ver 1.</p>
+<form id="coins_forecast">
+  <label for="coins">Please Select the Currency:</label><br>
+  <select id="coins" name="coins" autofocus>
+  </select>
+
+  <input type="submit" value="Click for Forecasts">
+
+</form>
+<br>
+<div style='visibility:hidden' id='loading_text'>
+  <div class="d-flex align-items-center">
+    <strong>Please wait a while... this may take some time</strong>
+    <div class="spinner-border ml-auto" role="status" aria-hidden="true"></div>
+  </div>
+</div>
+<!-- <div class="d-flex flex-column">
+  <div class='mb-2' id="daily_table"></div>
+  <div id="monthly_table"></div>
+<div class="d-flex flex-column">  
+  <div id="daily_chart"></div>
+  <div id="monthly_chart"></div>
+</div> -->
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <div id="daily_table"></div>
+    </div>
+    <div class="col">
+      <div id="daily_chart"></div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <div id="monthly_table"></div>
+    </div>
+    <div class="col">
+      <div id="monthly_chart"></div>
+    </div>
+  </div>
+</div>
+
+<script type='text/javascript' src='config.js'></script>
+
+<script>  
+  var daily_table=document.getElementById('daily_table')
+  var monthly_table=document.getElementById('monthly_table')
+  var daily_chart=document.getElementById('daily_chart')
+  var monthly_chart=document.getElementById('monthly_chart')
+  fetch('/coins', { method: 'POST' }).then(response => response.json()).then(data => {
+    console.log(data)
+    var select_coin = document.getElementById('coins')
+    for (const coin_key in data) {
+      if (Object.hasOwnProperty.call(data, coin_key)) {
+        const coin_value = data[coin_key];
+        var new_option = document.createElement('option')
+        new_option.value = coin_value[0]
+        new_option.textContent = coin_key
+        select_coin.appendChild(new_option)
+      }
+    }
+  })
+
+  function handleSubmit(event) {
+    event.preventDefault()
+    console.log(event.target[0].value)
+    var coin_value = event.target[0].value
+    var loading_text=document.getElementById('loading_text')
+    //loading_text.textContent='Please wait a while... this may take some time'
+    loading_text.style.visibility='visible'
+    fetch('/model', {
+      method: 'POST', headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify([coin_value])
+    }).then(response => response.json()).then(data => {
+      console.log(data)
+      loading_text.style.visibility='hidden'
+      //var daily_table=document.getElementById('daily_table')
+      daily_table.innerHTML=data.daily_forecasts
+      //var monthly_table=document.getElementById('monthly_table')
+      monthly_table.innerHTML=data.monthly_forecasts
+      
+      //var daily_chart=document.getElementById('daily_chart')
+      //daily_chart.innerHTML=data.chart_daily
+      var daily_chart=data.chart_daily
+      vegaEmbed("#daily_chart",daily_chart);
+      //var monthly_chart=document.getElementById('monthly_chart')
+      //monthly_chart.innerHTML=data.chart_monthly
+      var monthly_chart=data.chart_monthly
+      vegaEmbed("#monthly_chart",monthly_chart);
+
+      //var key = config.SECRET_API_KEY;
+    
+    //   var table_empty=document.createElement('table')
+    //   var table_body=document.createElement('tbody')
+    //   table_empty.appendChild(table_body)
+    //   for (const key in data.monthly_forecasts) {
+    //     if (Object.hasOwnProperty.call(data.monthly_forecasts, key)) {
+    //       const element = data.monthly_forecasts[key];
+          
+    //     }
+    //   }
+     })
+  }
+  function handleChange(){
+    daily_chart.innerHTML=''
+    monthly_chart.innerHTML=''
+    daily_table.innerHTML=''
+    monthly_table.innerHTML=''
+    }
+    var form = document.getElementById('coins_forecast')
+    var select=document.getElementById('coins')
+    form.onsubmit = handleSubmit
+    select.onchange=handleChange
+</script>
+
+<!--
+</body>
+
+</html>
+-->
+
+
+{% endblock %}
