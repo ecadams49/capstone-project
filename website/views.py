@@ -14,6 +14,11 @@ import os
 import pandas_datareader.data as web
 import arch
 
+from rq import Queue
+from worker import conn
+
+q = Queue(connection=conn)
+
 views = Blueprint('views', __name__)
 
 from flask import Flask, request
@@ -84,11 +89,15 @@ def get_coins_dict():
 @views.route('/model', methods=['POST'])
 def call_model():
     coin_value=request.json[0]
-    daily_forecasts=model(coin_value,'daily')
-    chart_daily=get_chart('daily')
-    monthly_forecasts=model(coin_value,'monthly')
-    chart_monthly=get_chart('monthly')
-    
+    #daily_forecasts=model(coin_value,'daily')
+    daily_forecasts=q.enqueue(model,coin_value,'daily')
+    #chart_daily=get_chart('daily')
+    chart_daily=q.enqueue(get_chart,'daily')
+    #monthly_forecasts=model(coin_value,'monthly')
+    monthly_forecasts=q.enqueue(model,coin_value,'monthly')
+    #chart_monthly=get_chart('monthly')
+    chart_monthly=q.enqueue(get_chart,'monthly')
+
     return jsonify({'daily_forecasts':daily_forecasts, 'monthly_forecasts':monthly_forecasts,
                     'chart_daily':chart_daily,'chart_monthly':chart_monthly})
 
