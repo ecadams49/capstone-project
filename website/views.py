@@ -128,7 +128,7 @@ def monthly_prices(coin):
 def model(coin,freq):
     if freq.lower()=='daily' or freq.lower()=="d":
         freq='daily'
-        f=7  # Length of Forecast Period in days.
+        f=30  # Length of Forecast Period in days.
         n=1
         data=daily_prices(coin)
         #t=2192 # Maximum of 6 years of daily prices.
@@ -142,7 +142,7 @@ def model(coin,freq):
         var='Daily Price'
     elif freq.lower()=='monthly' or freq.lower()=="m":
         freq='monthly'
-        f=6  # Length of Forecast Period in months.
+        f=12  # Length of Forecast Period in months.
         n=2
         data=monthly_prices(coin)
         #t=72  # Maximum of 6 years of monthly prices.
