@@ -91,6 +91,7 @@ def call_model():
     coin_value=request.json[0]
     #daily_forecasts=model(coin_value,'daily')
     daily_forecasts=q.enqueue(model,coin_value,'daily')
+    print(daily_forecasts)
     #chart_daily=get_chart('daily')
     chart_daily=q.enqueue(get_chart,'daily')
     #monthly_forecasts=model(coin_value,'monthly')
