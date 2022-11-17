@@ -86,6 +86,7 @@
   var monthly_table=document.getElementById('monthly_table')
   var daily_chart=document.getElementById('daily_chart')
   var monthly_chart=document.getElementById('monthly_chart')
+  var pending_jobs = {}
   fetch('/coins', { method: 'POST' }).then(response => response.json()).then(data => {
     console.log(data)
     var select_coin = document.getElementById('coins')
@@ -116,19 +117,32 @@
     }).then(response => response.json()).then(data => {
       console.log(data)
       loading_text.style.visibility='hidden'
+      pending_jobs = data
+      setInterval(async function(){
+          var {daily_forecasts_id, monthly_forecasts_id, chart_daily_id, chart_monthly_id} = pending_jobs
+          let res1 = await fetch(`/job?id=${daily_forecasts_id}`);
+          let result_daily_forecasts = await res1.json();
+          console.log(result_daily_forecasts)
+          let res2 = await fetch(`/job?id=${monthly_forecasts_id}`);
+          let result_monthly_forecasts = await res2.json();
+          let res3 = await fetch(`/job?id=${chart_daily_id}`);
+          let result_chart_daily = await res3.json();
+          let res4 = await fetch(`/job?id=${chart_monthly_id}`);
+          let result_chart_monthly = await res4.json();
+      },1000)
       //var daily_table=document.getElementById('daily_table')
-      daily_table.innerHTML=data.daily_forecasts
-      //var monthly_table=document.getElementById('monthly_table')
-      monthly_table.innerHTML=data.monthly_forecasts
+      // daily_table.innerHTML=data.daily_forecasts
+      // //var monthly_table=document.getElementById('monthly_table')
+      // monthly_table.innerHTML=data.monthly_forecasts
       
       //var daily_chart=document.getElementById('daily_chart')
       //daily_chart.innerHTML=data.chart_daily
-      var daily_chart=data.chart_daily
-      vegaEmbed("#daily_chart",daily_chart);
+      // var daily_chart=data.chart_daily
+      // vegaEmbed("#daily_chart",daily_chart);
       //var monthly_chart=document.getElementById('monthly_chart')
       //monthly_chart.innerHTML=data.chart_monthly
-      var monthly_chart=data.chart_monthly
-      vegaEmbed("#monthly_chart",monthly_chart);
+      // var monthly_chart=data.chart_monthly
+      // vegaEmbed("#monthly_chart",monthly_chart);
 
       //var key = config.SECRET_API_KEY;
     
