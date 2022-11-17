@@ -91,16 +91,24 @@ def call_model():
     coin_value=request.json[0]
     #daily_forecasts=model(coin_value,'daily')
     daily_forecasts=q.enqueue(model,coin_value,'daily')
-    print(daily_forecasts)
+    daily_forecasts_id = daily_forecasts.id
+    print('daily forecasts', daily_forecasts)
+    print('daily forecast id', daily_forecasts_id)
     #chart_daily=get_chart('daily')
     chart_daily=q.enqueue(get_chart,'daily')
     #monthly_forecasts=model(coin_value,'monthly')
     monthly_forecasts=q.enqueue(model,coin_value,'monthly')
     #chart_monthly=get_chart('monthly')
     chart_monthly=q.enqueue(get_chart,'monthly')
-
+   
     return jsonify({'daily_forecasts':daily_forecasts, 'monthly_forecasts':monthly_forecasts,
                     'chart_daily':chart_daily,'chart_monthly':chart_monthly})
+
+@views.route('/job', methods=['GET'])
+def respond():
+    # Retrieve the name from the url parameter /job?name=
+    id = request.args.get("id", None)
+    print('id', id)
 
 @views.route('/')
 @login_required
