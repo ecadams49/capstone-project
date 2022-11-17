@@ -1,1 +1,0 @@
-var config = {SECRET_API_KEY : 'Y_BCSoNL2Jo4yzCv6iN4'}

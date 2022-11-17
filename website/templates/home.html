@@ -116,19 +116,33 @@
       body: JSON.stringify([coin_value])
     }).then(response => response.json()).then(data => {
       console.log(data)
-      loading_text.style.visibility='hidden'
+      
       pending_jobs = data
-      setInterval(async function(){
+      var interval = setInterval(async function(){
           var {daily_forecasts_id, monthly_forecasts_id, chart_daily_id, chart_monthly_id} = pending_jobs
           let res1 = await fetch(`/job?id=${daily_forecasts_id}`);
           let result_daily_forecasts = await res1.json();
           console.log(result_daily_forecasts)
           let res2 = await fetch(`/job?id=${monthly_forecasts_id}`);
           let result_monthly_forecasts = await res2.json();
+          console.log(result_monthly_forecasts)
           let res3 = await fetch(`/job?id=${chart_daily_id}`);
           let result_chart_daily = await res3.json();
+          console.log(result_chart_daily)
           let res4 = await fetch(`/job?id=${chart_monthly_id}`);
           let result_chart_monthly = await res4.json();
+          console.log(result_chart_monthly)
+          if (result_daily_forecasts.result && result_monthly_forecasts.result && result_chart_daily.result && result_chart_monthly.result)
+          {
+            loading_text.style.visibility='hidden'
+            daily_table.innerHTML = result_daily_forecasts.result
+            monthly_table.innerHTML = result_monthly_forecasts.result
+            var daily_chart = result_chart_daily.result
+            vegaEmbed("#daily_chart",daily_chart);
+            var monthly_chart = result_chart_monthly.result
+            vegaEmbed("#monthly_chart",monthly_chart);
+            clearInterval(interval)
+          }
       },1000)
       //var daily_table=document.getElementById('daily_table')
       // daily_table.innerHTML=data.daily_forecasts
