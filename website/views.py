@@ -105,7 +105,7 @@ def call_model():
                     'chart_daily':chart_daily,'chart_monthly':chart_monthly})
 
 @views.route('/job', methods=['GET'])
-def respond():
+def get_job_id():
     # Retrieve the name from the url parameter /job?name=
     id = request.args.get("id", None)
     print('id', id)
