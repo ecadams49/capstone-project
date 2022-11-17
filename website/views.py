@@ -90,18 +90,18 @@ def get_coins_dict():
 def call_model():
     coin_value=request.json[0]
     #daily_forecasts=model(coin_value,'daily')
-    daily_forecasts=q.enqueue(model,coin_value,'daily')
+    daily_forecasts = q.enqueue(model,coin_value,'daily')
     daily_forecasts_id = daily_forecasts.id
     print('daily forecasts', daily_forecasts)
     print('daily forecast id', daily_forecasts_id)
     #chart_daily=get_chart('daily')
-    chart_daily=q.enqueue(get_chart,'daily')
+    chart_daily = q.enqueue(get_chart,'daily')
     chart_daily_id = chart_daily.id
     #monthly_forecasts=model(coin_value,'monthly')
-    monthly_forecasts=q.enqueue(model,coin_value,'monthly')
+    monthly_forecasts = q.enqueue(model,coin_value,'monthly')
     monthly_forecasts_id = monthly_forecasts.id
     #chart_monthly=get_chart('monthly')
-    chart_monthly=q.enqueue(get_chart,'monthly')
+    chart_monthly = q.enqueue(get_chart,'monthly')
     chart_monthly_id = chart_monthly.id
    
     return jsonify({'daily_forecasts_id':daily_forecasts_id, 'monthly_forecasts_id':monthly_forecasts_id,
@@ -112,10 +112,12 @@ def get_job_id():
     # Retrieve the name from the url parameter /job?name=
     id = request.args.get("id", None)
     job = q.fetch_job(id)
-    state = job.get_result_ttl()
+    state = job.is_finished
     print('id', id)
     print('job', job)
     print('state', state)
+    if job.is_finished:
+        return jsonify({'id':id, 'result':job.result})
     return jsonify({'id':id,'state':state})
 
 @views.route('/')
