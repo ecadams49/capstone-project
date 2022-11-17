@@ -118,7 +118,8 @@ def get_job_id():
     print('state', state)
     if job.is_finished:
         return jsonify({'id':id, 'result':job.result})
-    return jsonify({'id':id,'state':state})
+    else:
+        return jsonify({'id':id,'state':state})
 
 @views.route('/')
 @login_required
