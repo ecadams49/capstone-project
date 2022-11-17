@@ -53,6 +53,12 @@
     <div class="spinner-border ml-auto" role="status" aria-hidden="true"></div>
   </div>
 </div>
+<div style='visibility:hidden' id='error_text'>
+  <div class="d-flex align-items-center text-danger">
+    <strong>Error Occured!!</strong>
+  </div>
+</div>
+
 <!-- <div class="d-flex flex-column">
   <div class='mb-2' id="daily_table"></div>
   <div id="monthly_table"></div>
@@ -79,8 +85,6 @@
   </div>
 </div>
 
-<script type='text/javascript' src='config.js'></script>
-
 <script>  
   var daily_table=document.getElementById('daily_table')
   var monthly_table=document.getElementById('monthly_table')
@@ -105,9 +109,11 @@
     event.preventDefault()
     console.log(event.target[0].value)
     var coin_value = event.target[0].value
-    var loading_text=document.getElementById('loading_text')
+    var loading_text = document.getElementById('loading_text')
+    var error_text = document.getElementById('error_text')
     //loading_text.textContent='Please wait a while... this may take some time'
     loading_text.style.visibility='visible'
+    error_text.style.visibility='hidden'
     fetch('/model', {
       method: 'POST', headers: {
         'Accept': 'application/json',
@@ -169,6 +175,9 @@
           
     //     }
     //   }
+     }).catch(function(error){
+      loading_text.style.visibility='hidden'
+      error_text.style.visibility='visible'
      })
   }
   function handleChange(){
