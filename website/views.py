@@ -109,6 +109,7 @@ def respond():
     # Retrieve the name from the url parameter /job?name=
     id = request.args.get("id", None)
     print('id', id)
+    return jsonify({'id':id})
 
 @views.route('/')
 @login_required
