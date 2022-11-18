@@ -55,7 +55,7 @@
 </div>
 <div style='visibility:hidden' id='error_text'>
   <div class="d-flex align-items-center text-danger">
-    <strong>Error Occured!!</strong>
+    <strong>Error Occurred!!</strong>
   </div>
 </div>
 
@@ -91,6 +91,7 @@
   var daily_chart=document.getElementById('daily_chart')
   var monthly_chart=document.getElementById('monthly_chart')
   var pending_jobs = {}
+  var interval = null
   fetch('/coins', { method: 'POST' }).then(response => response.json()).then(data => {
     console.log(data)
     var select_coin = document.getElementById('coins')
@@ -124,7 +125,11 @@
       console.log(data)
       
       pending_jobs = data
-      var interval = setInterval(async function(){
+      if (interval !== null){
+        clearInterval(interval)
+      }
+      
+      interval = setInterval(async function(){
           var {daily_forecasts_id, monthly_forecasts_id, chart_daily_id, chart_monthly_id} = pending_jobs
           let res1 = await fetch(`/job?id=${daily_forecasts_id}`);
           let result_daily_forecasts = await res1.json();
@@ -149,7 +154,7 @@
             vegaEmbed("#monthly_chart",monthly_chart);
             clearInterval(interval)
           }
-      },1000)
+      },1500)
       //var daily_table=document.getElementById('daily_table')
       // daily_table.innerHTML=data.daily_forecasts
       // //var monthly_table=document.getElementById('monthly_table')
@@ -178,6 +183,7 @@
      }).catch(function(error){
       loading_text.style.visibility='hidden'
       error_text.style.visibility='visible'
+      clearInterval(interval)
      })
   }
   function handleChange(){
